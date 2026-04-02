@@ -17,7 +17,8 @@ builder.Services.AddControllers().AddJsonOptions(o =>
     o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
-builder.Services.AddDbContext<OrdersApiDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
+builder.Services.AddDbContext<OrdersApiDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+    x => x.MigrationsAssembly("Order.Infrastructure")))
     .AddApplication().AddInfrastructure();
 
 var app = builder.Build();
