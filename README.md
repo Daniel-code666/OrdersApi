@@ -28,10 +28,10 @@ Cliente → Orders.Gateway → Orders API → RabbitMQ → Orders.Worker → Mai
 - Envío de correo de prueba usando Mailpit tras consumir el evento
 
 ## Servicios disponibles
-Orders API: http://localhost:8080
-Orders Gateway: http://localhost:8081
-RabbitMQ Management: http://localhost:15672
-Mailpit: http://localhost:8025
+- `Orders API`: http://localhost:8080
+- `Orders Gateway`: http://localhost:8081
+- `RabbitMQ Management`: http://localhost:15672
+- `Mailpit`: http://localhost:8025
 
 ## Infraestructura
 
