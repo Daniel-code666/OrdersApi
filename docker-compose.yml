@@ -1,0 +1,114 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: orders-postgres
+    environment:
+      POSTGRES_DB: OrdersDb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - orders-network
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: orders-rabbitmq
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - orders-network
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: orders-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - orders-network
+
+  orders_api:
+    container_name: orders-api
+    build:
+      context: .
+      dockerfile: Orders.Api/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=OrdersDb;Username=admin;Password=1234
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Port: 5672
+      RabbitMq__Username: admin
+      RabbitMq__Password: admin123
+      RabbitMq__Exchange: orders.events
+      RabbitMq__Queue: orders.created
+      RabbitMq__RoutingKey: order.created
+    networks:
+      - orders-network
+
+  orders_gateway:
+    container_name: orders-gateway
+    build:
+      context: .
+      dockerfile: Orders.Gateway/Dockerfile
+    ports:
+      - "8081:8080"
+    depends_on:
+      - orders_api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+    networks:
+      - orders-network
+
+  orders_worker:
+    container_name: orders-worker
+    build:
+      context: .
+      dockerfile: Orders.Worker/Dockerfile
+    depends_on:
+      - rabbitmq
+      - mailpit
+    environment:
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Port: 5672
+      RabbitMq__Username: admin
+      RabbitMq__Password: admin123
+      RabbitMq__Exchange: orders.events
+      RabbitMq__Queue: orders.created
+      RabbitMq__RoutingKey: order.created
+      Mail__Host: mailpit
+      Mail__Port: 1025
+      Mail__EnableSsl: false
+      Mail__UseDefaultCredentials: false
+      Mail__Username:
+      Mail__Password:
+      Mail__From: no-reply@orders.local
+      Mail__To: test@example.com
+    networks:
+      - orders-network
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+
+networks:
+  orders-network:
+    driver: bridge
