@@ -16,10 +16,13 @@ namespace Order.Infrastructure.Repository
             _dbContext = dbContext;
         }
 
-        async Task<bool> IOrdersRepository.CreateOrder(OrdersEntity order)
+        async Task<int> IOrdersRepository.CreateOrder(OrdersEntity order)
         {
             _dbContext.Orders.Add(order);
-            return await _dbContext.SaveChangesAsync() > 0;
+            var rows_affected = await _dbContext.SaveChangesAsync();
+            if (rows_affected == 0)
+                return 0;
+            return order.Id;
         }
 
         async Task<OrdersEntity?> IOrdersRepository.GetOrderById(int id)

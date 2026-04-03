@@ -15,6 +15,9 @@ namespace Orders.Application.Common
         {
             CreateMap<OrdersEntity, OrdersRead>();
             CreateMap<OrdersCreate, OrdersEntity>();
+            CreateMap<OrdersEntity, OrdersCreated>()
+                .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreationDate));
         }
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Order.Infrastructure;
+using Order.Infrastructure.Messaging;
 using Order.Infrastructure.OrdersDbContext;
 using Orders.Application;
 using System.Text.Json.Serialization;
@@ -20,6 +21,9 @@ builder.Services.AddControllers().AddJsonOptions(o =>
 builder.Services.AddDbContext<OrdersApiDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
     x => x.MigrationsAssembly("Order.Infrastructure")))
     .AddApplication().AddInfrastructure();
+
+builder.Services.Configure<RabbitMqOptions>(
+    builder.Configuration.GetSection("RabbitMq"));
 
 var app = builder.Build();
 

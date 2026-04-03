@@ -5,7 +5,7 @@ namespace Orders.Application.Interfaces
 {
     public interface IOrdersRepository
     {
-        Task<bool> CreateOrder(OrdersEntity order);
+        Task<int> CreateOrder(OrdersEntity order);
         Task<OrdersEntity?> GetOrderById(int Id);
         Task<IEnumerable<OrdersEntity>> GetAllOrders(OrdersFilters filters);
     }
