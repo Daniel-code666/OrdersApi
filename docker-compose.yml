@@ -43,7 +43,7 @@ services:
     container_name: orders-api
     build:
       context: .
-      dockerfile: Orders.Api/Dockerfile
+      dockerfile: Orders/Dockerfile
     ports:
       - "8080:8080"
     depends_on:
