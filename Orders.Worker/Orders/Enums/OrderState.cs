@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Order.Domain.Entitites.Enums.OrdersEnum
+namespace Orders.Worker.Orders.Enums
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum OrderState
